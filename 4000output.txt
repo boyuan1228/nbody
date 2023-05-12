@@ -1,0 +1,54 @@
+Script started on Fri 12 May 2023 06:50:59 PM EDT
+[(ea-cisc372:allenyby)@login00.darwin HW4]$ cat config.h
+
+#ifndef __CONFIG_H__
+#define __CONFIG_H__
+#define NUMPLANETS      8
+#define MINUTE                  60
+#define HOUR                    MINUTE*60
+#define DAY                     HOUR*24
+#define WEEK                    DAY*7
+#define YEAR                    DAY*365
+//Configurable
+#define NUMASTEROIDS 4000
+#define GRAV_CONSTANT 6.67e-11 //the gravitational constant
+#define MAX_DISTANCE 5000.0
+#define MAX_VELOCITY 50000.0
+#define MAX_MASS 938e18  //approximate mass of ceres.
+#define DURATION (10*YEAR)
+#define INTERVAL DAY
+//End Configurable
+
+// #define DEBUG
+
+#define NUMENTITIES (NUMPLANETS+NUMASTEROIDS+1)
+#endif
+[(ea-cisc372:allenyby)@login00.darwin HW4]$ vpkg_require gcc
+[(ea-cisc372:allenyby)@login00.darwin HW4]$ vpkg_require cuda
+[(ea-cisc372:allenyby)@login00.darwin HW4]$ nvcc *.cu -o nbody -DDEBUG
+[(ea-cisc372:allenyby)@login00.darwin HW4]$ make clean
+rm -f *.o nbody
+[(ea-cisc372:allenyby)@login00.darwin HW4]$ make
+nvcc -DDEBUG compute.cu nbody.cu -lm -o nbody
+[(ea-cisc372:allenyby)@login00.darwin HW4]$ salloc --ntasks=1 --cpus-per-task=1 --gpus=1 --partition=gpu-v100
+salloc: Granted job allocation 4052493
+salloc: Waiting for resource configuration
+salloc: Nodes r2v01 are ready for job
+[allenyby@r2v01 HW4]$ srun ./nbody > result.txt
+[allenyby@r2v01 HW4]$ tail result.txt
+pos=(46994.728314,-1828.522352,-22170.179604,),v=(1782.215893,1871.738987,3087.881016,),m=711143905490238177280.000000
+pos=(-3332.616181,-31309.946944,47752.781211,),v=(4088.805071,3916.408605,3293.627788,),m=225135859733045051392.000000
+pos=(-22079.526806,-23084.208543,-38676.932914,),v=(2096.004187,-1102.037740,467.836277,),m=761854660362868883456.000000
+pos=(-14110.231383,-46288.072502,22429.317363,),v=(-1280.208824,250.176906,2583.661460,),m=95504880418770436096.000000
+pos=(3308.127473,-5803.821821,-16639.735814,),v=(-1866.860225,-4285.368700,-2818.533963,),m=31601353628375265280.000000
+pos=(-33703.457929,37256.583938,-23763.793508,),v=(4078.645180,-3521.185740,-3985.048094,),m=524886603814031261696.000000
+pos=(30914.569311,-31887.518979,20614.250084,),v=(3005.354557,1127.472467,-2370.972427,),m=64560882632881807360.000000
+pos=(-3549.135362,27782.262386,34928.575430,),v=(3830.055505,4848.231203,-1350.611065,),m=720538266512815947776.000000
+pos=(-43256.764250,47529.687592,-37682.169856,),v=(-2882.714946,-2545.813521,-2433.633980,),m=128785866109088923648.000000
+This took a total time of 4.890000 seconds
+[allenyby@r2v01 HW4]$ exit
+logout
+salloc: Relinquishing job allocation 4052493
+[(ea-cisc372:allenyby)@login00.darwin HW4]$ exit
+exit
+
